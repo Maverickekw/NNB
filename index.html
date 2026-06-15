@@ -70,6 +70,21 @@
             0%,100% { box-shadow: 0 0 10px rgba(231,76,60,.4); }
             50%      { box-shadow: 0 0 32px rgba(231,76,60,1);  }
         }
+        #endTurnBtn {
+            pointer-events: auto;
+            background: linear-gradient(135deg,#1a4a1a,#27ae60);
+            border: 2px solid #2ecc71; color: #fff;
+            padding: 8px 13px; border-radius: 8px; cursor: pointer;
+            font-size: 10px; font-weight: bold; letter-spacing: 1px;
+            text-transform: uppercase; line-height: 1.4; text-align: center;
+            opacity: .3; pointer-events: none;
+            transition: opacity .3s, box-shadow .3s; white-space: nowrap;
+        }
+        #endTurnBtn.active {
+            opacity: 1; pointer-events: auto;
+            box-shadow: 0 0 12px rgba(46,204,113,.6);
+        }
+        #endTurnBtn.active:hover { box-shadow: 0 0 20px rgba(46,204,113,.9); }
         #log {
             margin-top: 10px; font-size: 13px; font-weight: bold;
             color: #f1c40f; text-align: center; min-height: 20px;
@@ -97,6 +112,7 @@
                     <div class="cdfill" id="cd1" style="height:0%"></div>
                 </div>
             </div>
+            <button id="endTurnBtn" onclick="manualEndTurn()">END<br>TURN</button>
             <button id="ultBtn" onclick="triggerUltimate()">SECRET<br>JUTSU</button>
         </div>
     </div>
@@ -108,7 +124,8 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx    = canvas.getContext('2d');
 const logEl  = document.getElementById('log');
-const ultBtn = document.getElementById('ultBtn');
+const ultBtn    = document.getElementById('ultBtn');
+const endTurnBtn = document.getElementById('endTurnBtn');
 const badge  = document.getElementById('turnBadge');
 const W = canvas.width, H = canvas.height;
 
@@ -628,8 +645,14 @@ function callSupport(idx){
     assistSupport(idx); s.cdLeft=s.cdMax; refreshUI(idx);
 }
 
+function manualEndTurn(){
+    if(!playerTurn||isUltActive||gameOver||!gameReady) return;
+    endPlayerTurn();
+}
+
 function endPlayerTurn(){
     if(gameOver) return; playerTurn=false; turnMoveUsed=false;
+    endTurnBtn.className='';
     setBadge('ENEMY TURN','#e74c3c'); setTimeout(enemyTurn,800);
 }
 
@@ -651,7 +674,8 @@ function enemyTurn(){
 
 function startPlayerTurn(){
     if(gameOver) return; playerTurn=true;
-    setBadge('YOUR TURN','#2ecc71'); log('Your turn! Drag Naruto to attack.');
+    endTurnBtn.className='active';
+    setBadge('YOUR TURN','#2ecc71'); log('Your turn! Drag Naruto to attack or use supports, then End Turn.');
 }
 
 function addGauge(v){
@@ -803,6 +827,7 @@ function frame(){
 
 refreshUI(0); refreshUI(1);
 setBadge('YOUR TURN','#2ecc71');
+endTurnBtn.className='active';
 frame();
 </script>
 </body>
