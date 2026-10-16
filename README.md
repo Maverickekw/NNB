@@ -8,6 +8,34 @@ npm start        # serves on http://localhost:8080 (any static server works)
 npm test         # gacha / element / squad unit tests
 ```
 
+## Android APK
+
+A ready-to-install build lives at **`dist/riotshift.apk`** (Android 7.0+, landscape).
+Copy it to a phone and open it, allowing "install unknown apps" for your file
+manager or browser when asked. The whole game is bundled, so it plays offline.
+
+Rebuild after changing the game (needs Python 3 with `cryptography`, Java, and Maven;
+no Android SDK or Gradle):
+
+```sh
+python3 android/build_apk.py            # -> dist/riotshift.apk
+python3 android/build_apk.py --version-code 2 --version-name 0.2.0
+```
+
+How it works: `android/` holds a small native shell, a full-screen immersive
+WebView written in smali, that serves the game from the APK's `assets/` folder
+at `https://appassets.androidplatform.net/`. The script fetches `aapt2` (bundled
+in apktool) and the smali assembler from Maven Central into `android/.tools/`,
+then links resources, assembles `classes.dex`, zip-aligns the APK, and signs it
+with APK Signature Scheme v2. To debug the running game, open `chrome://inspect`
+on a computer with the phone connected over USB.
+
+**Signing key:** the first build creates `android/.keys/`, which is git-ignored.
+Android only installs an update over an existing install if both builds were
+signed with the same key, so back the key up. With a different key, you must
+uninstall the old version first. For Play Store release, sign with your own
+key: `--key key.pem --cert cert.pem`.
+
 ## Art: what's real and what's a placeholder
 
 The code never creates character art. Characters render from `/Assets/Characters` and
